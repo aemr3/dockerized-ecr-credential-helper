@@ -16,5 +16,5 @@ RUN apk --no-cache add --virtual build-dependencies gcc g++ musl-dev go git && \
 
 FROM gcr.io/cloud-builders/docker
 
-COPY --from=0  /usr/bin/docker-credential-ecr-login /usr/bin/ecr-login
+COPY --from=0 /usr/bin/docker-credential-ecr-login /usr/bin/ecr-login
 COPY config.json /etc/docker-config.json
