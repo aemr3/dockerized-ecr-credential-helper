@@ -1,0 +1,1 @@
+# dockerized-ecr-credential-helper
