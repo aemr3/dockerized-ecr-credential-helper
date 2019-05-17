@@ -13,5 +13,5 @@ RUN apt-get update -y && apt-get install -y wget git && \
 
 FROM gcr.io/cloud-builders/docker
 
-COPY --from=0 /go/bin/docker-credential-ecr-login /usr/bin/ecr-login
+COPY --from=0 /go/bin/docker-credential-ecr-login /usr/bin/docker-credential-ecr-login
 COPY config.json /etc/docker-config.json
