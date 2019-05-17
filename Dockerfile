@@ -1,20 +1,17 @@
-FROM alpine:3.7
+FROM ubuntu:xenial
 
-RUN apk add --no-cache ca-certificates
-RUN apk --no-cache add --virtual build-dependencies gcc g++ musl-dev go git && \
-    export GOPATH=/go && \
-    export PATH=$GOPATH/bin:$PATH && \
-    mkdir $GOPATH && \
-    chmod -R 777 $GOPATH && \
-    APP_REPO=github.com/awslabs/amazon-ecr-credential-helper && \
-    git clone https://$APP_REPO $GOPATH/src/$APP_REPO && \
-    cd $GOPATH/src/$APP_REPO && \
-    git checkout $APP_VERSION && \
-    GOOS=linux CGO_ENABLED=0 go build -installsuffix cgo -a -ldflags '-s -w' -o /usr/bin/docker-credential-ecr-login ./ecr-login/cli/docker-credential-ecr-login && \
-    apk del --purge -r build-dependencies && \
-    rm -rf /go
+RUN apt-get update -y && apt-get install -y wget git && \
+  wget -q https://dl.google.com/go/go1.12.2.linux-amd64.tar.gz && \
+  tar -xzf go1.12.2.linux-amd64.tar.gz && \
+  rm -f go1.12.2.linux-amd64.tar.gz && \
+  mv /go /usr/local && \
+  export GOPATH=/go && \
+  export GOROOT=/usr/local/go && \
+  export PATH=$GOPATH/bin:$GOROOT/bin:$PATH && \
+  mkdir $GOPATH && \
+  go get -u github.com/awslabs/amazon-ecr-credential-helper/ecr-login/cli/docker-credential-ecr-login
 
 FROM gcr.io/cloud-builders/docker
 
-COPY --from=0  /usr/bin/docker-credential-ecr-login /usr/bin/ecr-login
+COPY --from=0 /go/bin/docker-credential-ecr-login /usr/bin/ecr-login
 COPY config.json /etc/docker-config.json
